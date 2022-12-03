@@ -1,17 +1,13 @@
+def component = [
+		Preprocess: false,
+		Hyper: false,
+		Train: false,
+		Test: false,
+		Bento: false
+]
 pipeline {
 	agent any
-	parameters {
-		choice(name: 'VERSION', choices: ['1.1.0','1.2.0','1.3.0'], description: '')
-		booleanParam(name: 'executeTests', defaultValue: true, description: '')
-	}
 	stages {
-		stage("init") {
-			steps {
-				script {
-					gv = load "script.groovy"
-				}
-			}
-		}
 		stage("Checkout") {
 			steps {
 				checkout scm
@@ -19,38 +15,39 @@ pipeline {
 		}
 		stage("Build") {
 			steps {
-				sh 'docker-compose build web'
-			}
-		}
-		stage("test") {
-			when {
-				expression {
-					params.executeTests
-				}
-			}
-			steps {
-				script {
-					gv.testApp()
+                script {
+					component.each{ entry ->
+						stage ("${entry.key} Build"){
+							if(entry.value){
+								var = entry.key
+								sh "docker-compose build ${var.toLowerCase()}"
+							}	
+						}
+					}
 				}
 			}
 		}
 		stage("Tag and Push") {
 			steps {
-				withCredentials([[$class: 'UsernamePasswordMultiBinding',
-				credentialsId: 'docker-hub', 
-				usernameVariable: 'DOCKER_USER_ID', 
-				passwordVariable: 'DOCKER_USER_PASSWORD'
-				]]) {
-					sh "docker tag jenkins-pipeline_web:latest ${DOCKER_USER_ID}/jenkins-app:${BUILD_NUMBER}"
-					sh "docker login -u ${DOCKER_USER_ID} -p ${DOCKER_USER_PASSWORD}"
-					sh "docker push ${DOCKER_USER_ID}/jenkins-app:${BUILD_NUMBER}"
+                script {
+					component.each{ entry ->
+						stage ("${entry.key} Push"){
+							if(entry.value){
+								var = entry.key
+								withCredentials([[$class: 'UsernamePasswordMultiBinding',
+								credentialsId: 'docker_credentials',
+								usernameVariable: 'DOCKER_USER_ID',
+								passwordVariable: 'DOCKER_USER_PASSWORD'
+								]]){
+								sh "docker tag spaceship_pipeline_${var.toLowerCase()}:latest ${DOCKER_USER_ID}/spaceship_pipeline_${var.toLowerCase()}:${BUILD_NUMBER}"
+								sh "docker login -u ${DOCKER_USER_ID} -p ${DOCKER_USER_PASSWORD}"
+								sh "docker push ${DOCKER_USER_ID}/spaceship_pipeline_${var.toLowerCase()}:${BUILD_NUMBER}"
+								}
+							}
+						}
+					}
 				}
-			}
-		}
-		stage("deploy") {
-			steps {
-				sh "docker-compose up -d"
-			}
+			}	
 		}
 	}
 }
