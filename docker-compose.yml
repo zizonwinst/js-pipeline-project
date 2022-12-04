@@ -1,6 +1,10 @@
 version: "3"
+
 services:
-  preprocess:
-    build: ./app
-    container_name: spaceship_pipeline_web
- 
+  web:
+    build: .
+    container_name: fastapi-app
+    volumes:
+      - .:/code
+    ports:
+      - "90:90"
