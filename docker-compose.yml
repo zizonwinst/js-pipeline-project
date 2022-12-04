@@ -3,15 +3,4 @@ services:
   preprocess:
     build: ./app
     container_name: spaceship_pipeline_web
-  hyper:
-    build: ./hyper-tuning
-    container_name: spaceship-hyper-tuning
-  train:
-    build: ./train
-    container_name: spaceship-train
-  test:
-    build: ./test
-    container_name: spaceship-test
-  bento:
-    build: ./bento
-    container_name: spaceship-bento
+ 
