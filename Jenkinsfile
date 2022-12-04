@@ -1,5 +1,5 @@
 def component = [
-		Preprocess: true,
+		App: true,
 		Hyper: false,
 		Train: false,
 		Test: false,

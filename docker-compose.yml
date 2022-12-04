@@ -1,8 +1,8 @@
 version: "3"
 services:
   preprocess:
-    build: ./preprocess
-    container_name: spaceship-preprocess
+    build: ./app
+    container_name: spaceship_pipeline_web
   hyper:
     build: ./hyper-tuning
     container_name: spaceship-hyper-tuning
