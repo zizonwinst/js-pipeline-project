@@ -41,9 +41,9 @@ pipeline {
 				usernameVariable: 'DOCKER_USER_ID', 
 				passwordVariable: 'DOCKER_USER_PASSWORD'
 				]]) {
-					sh "docker tag spaceship_pipeline_web:latest ${DOCKER_USER_ID}/jenkins-app1:${BUILD_NUMBER}"
+					sh "docker tag spaceship_pipeline_web:latest ${DOCKER_USER_ID}/jenkins-app:${BUILD_NUMBER}"
 					sh "docker login -u ${DOCKER_USER_ID} -p ${DOCKER_USER_PASSWORD}"
-					sh "docker push ${DOCKER_USER_ID}/jenkins-app1:${BUILD_NUMBER}"
+					sh "docker push ${DOCKER_USER_ID}/jenkins-app:${BUILD_NUMBER}"
 				}
 			}
 		}
